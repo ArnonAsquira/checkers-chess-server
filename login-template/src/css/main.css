@@ -1,0 +1,107 @@
+@import url("https://fonts.googleapis.com/css2?family=M+PLUS+1+Code:wght@300&display=swap");
+body {
+  background: -webkit-gradient(linear, left bottom, right top, from(#74b9ff), to(#0984e3));
+  background: linear-gradient(to right top, #74b9ff, #0984e3);
+  font-family: "M PLUS 1 Code", sans-serif;
+  color: #d63031;
+}
+
+button {
+  border: none;
+  outline: none;
+  background-color: rgba(190, 190, 190, 0.5);
+  font-family: inherit;
+  font-weight: 600;
+  letter-spacing: 3px;
+  -webkit-transition: all 0.5s;
+  transition: all 0.5s;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: white;
+}
+
+.input-field-container {
+  top: 0;
+  background: -webkit-gradient(linear, right top, left bottom, from(rgba(255, 255, 255, 0.5)), to(rgba(255, 255, 255, 0.3)));
+  background: linear-gradient(to left bottom, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.3));
+  height: 100vh;
+  width: 35vw;
+  margin-left: auto;
+  margin-right: auto;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  border-radius: 1em;
+}
+
+.input-field-container h1 {
+  text-align: center;
+  border-bottom: 2px solid rgba(50, 50, 50, 0.9);
+}
+
+.input-field-container form {
+  font-size: 1.2rem;
+  margin: 30px auto;
+  width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+.input-field-container form input {
+  border: none;
+  outline: none;
+  height: 100%;
+  -webkit-transition: all 0.5s;
+  transition: all 0.5s;
+}
+
+.input-field-container form input:hover {
+  background-color: palevioletred;
+}
+
+.input-field-container form input:focus {
+  background-color: powderblue;
+  color: purple;
+}
+
+.submit-button {
+  border: none;
+  outline: none;
+  background-color: rgba(190, 190, 190, 0.5);
+  font-family: inherit;
+  font-weight: 600;
+  letter-spacing: 3px;
+  -webkit-transition: all 0.5s;
+  transition: all 0.5s;
+  cursor: pointer;
+  background-color: #ff7675;
+  width: 30%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.submit-button:hover {
+  background-color: white;
+}
+
+.submit-button:hover {
+  background-color: #a29bfe;
+}
+
+.login-button {
+  border-right: 1px solid black;
+}
+/*# sourceMappingURL=main.css.map */
