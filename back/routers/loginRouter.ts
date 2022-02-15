@@ -4,9 +4,10 @@ import { validateUser } from "../middlewares/validateSchema";
 import { RefreshTokens } from "../mongo/refreshTokensSchmea";
 import { generateAccesToken } from "../utils/jwtFunction";
 import { UserForToken } from "../types/userTypes";
+import { SECRET } from "../utils/enviormentVars";
 const Router = express();
 
-const secret = process.env.secret;
+const secret = SECRET;
 
 Router.post("/", validateUser, async (_req, res, next) => {
   try {
