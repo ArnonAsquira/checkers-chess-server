@@ -51,7 +51,8 @@ export const validateUser: RequestHandler = async (req, res, next) => {
 };
 
 export const authenticateToken: RequestHandler = (req, res, next) => {
-  const accessToken = req.headers.authorization.split(" ")[1];
+  const accessToken =
+    req.headers.authorization && req.headers.authorization.split(" ")[1];
   if (!accessToken) return res.status(401).send("Access Token Required");
   jwt.verify(accessToken, secret, (err, user) => {
     if (err) return res.status(403).send("Invalid Access Token");

@@ -15,6 +15,26 @@ const UserScema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  checkersData: {
+    type: {
+      wins: Array,
+      loses: Array,
+    },
+    default: {
+      wins: [],
+      loses: [],
+    },
+  },
+  chessData: {
+    type: {
+      wins: Array,
+      loses: Array,
+    },
+    default: {
+      wins: [],
+      loses: [],
+    },
+  },
 });
 
 export const User = mongoose.model("user", UserScema);
