@@ -1,5 +1,5 @@
 import * as dotenv from "dotenv";
-dotenv.config({ path: __dirname + "/../../.env" });
+dotenv.config();
 
 const MONGO_URL: string =
   process.env.NODE_ENV === "test"
