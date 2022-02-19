@@ -2,6 +2,12 @@ interface IGameObject {
   playerOne: string | null;
   playerTwo: string | null;
   gameId: string;
+  gameinfo: IGameInfo;
+}
+
+interface IGameInfo {
+  positions: IBoardPositions;
+  turn: PlatyerColors;
 }
 
 interface IndicatorInfo {
@@ -48,4 +54,5 @@ export type {
   ITurn,
   PlatyerColors,
   IGameObject,
+  IGameInfo,
 };

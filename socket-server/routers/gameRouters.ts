@@ -6,6 +6,7 @@ import {
   pushGameToArray,
   retrieveGameObject,
 } from "../userManegement/gameHandeling";
+import joinGame from "./utils/gameUtils/joinGame";
 const router = express();
 
 router.get("/token", (req, res) => {
@@ -15,29 +16,8 @@ router.get("/token", (req, res) => {
 
 router.post("/join", (req, res) => {
   const body: IJoinGameBody = req.body;
-  console.log(body);
-  if (!body.gameToken || !body.userId) {
-    return res.status(403).send("invalid body");
-  }
-  const gameobj = retrieveGameObject(body.gameToken);
-  console.log(gameobj);
-  if (gameobj) {
-    if (gameobj.playerTwo !== null) {
-      return res.status(403).send("game is already full");
-    }
-    gameobj.playerTwo = body.userId;
-    return res.json({ player: "two", gameId: body.gameToken });
-  }
-  const newGameObj: IGameObject = {
-    playerOne: body.userId,
-    playerTwo: null,
-    gameId: body.gameToken,
-  };
-  const pushSucceded = pushGameToArray(newGameObj);
-  if (pushSucceded) {
-    return res.send("new game created");
-  }
-  return res.status(500).send("failed to create new game");
+  const joinedGameResponse = joinGame(body.gameToken, body.userId);
+  res.status(joinedGameResponse.status).send(joinedGameResponse.message);
 });
 
 export default router;

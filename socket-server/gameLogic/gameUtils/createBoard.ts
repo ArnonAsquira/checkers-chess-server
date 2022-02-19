@@ -1,4 +1,4 @@
-import { Location } from "../../types/gameTypes";
+import { IBoardPositions, Location } from "../../types/gameTypes";
 
 const amountOfRows = 8;
 
@@ -19,7 +19,7 @@ const initailPlayersLocations: { red: Location[]; blue: Location[] } = {
   blue: darkTiles.slice(20, 32),
 };
 
-const initialPositions = {
+const initialPositions = (): IBoardPositions => ({
   red: initailPlayersLocations.red.map((location) => ({
     location,
     isQueen: false,
@@ -28,7 +28,7 @@ const initialPositions = {
     location,
     isQueen: false,
   })),
-};
+});
 
 export {
   initailPlayersLocations,
