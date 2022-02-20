@@ -14,15 +14,7 @@ const joinGame = (gameToken: string, userId: string): IFunctionResponse => {
       return makeFucntionResponse(false, "game full", 403);
     }
     gameobj.playerTwo = userId;
-    return makeFucntionResponse(
-      true,
-      JSON.stringify({
-        player: "two",
-        gameId: gameToken,
-        gmeInfo: gameobj.gameinfo,
-      }),
-      200
-    );
+    return makeFucntionResponse(true, JSON.stringify(gameobj), 200);
   }
   const newGameInfo = createNewGame();
 
@@ -34,15 +26,7 @@ const joinGame = (gameToken: string, userId: string): IFunctionResponse => {
   };
   const pushSucceded = pushGameToArray(newGameObj);
   if (pushSucceded) {
-    return makeFucntionResponse(
-      true,
-      JSON.stringify({
-        player: "one",
-        gameId: gameToken,
-        gmeInfo: newGameObj.gameinfo,
-      }),
-      200
-    );
+    return makeFucntionResponse(true, JSON.stringify(newGameObj), 200);
   }
   return makeFucntionResponse(false, "failed to create game", 500);
 };

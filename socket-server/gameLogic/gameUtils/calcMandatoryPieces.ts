@@ -24,7 +24,6 @@ const adjacentPieces = (positions: IBoardPositions, turn: PlatyerColors) => {
       uniqueIndicators.push(allIndicators[i]);
     }
   }
-  console.log(uniqueIndicators);
   return uniqueIndicators.filter((info) => info.endangers);
 };
 

@@ -8,6 +8,9 @@ interface IGameObject {
 interface IGameInfo {
   positions: IBoardPositions;
   turn: PlatyerColors;
+  isFirst: boolean;
+  selcetedPiece: IPieceInfoObject | null;
+  indicators: IndicatorInfo[];
 }
 
 interface IndicatorInfo {

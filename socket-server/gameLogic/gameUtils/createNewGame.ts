@@ -6,6 +6,9 @@ const createNewGame = (): IGameInfo => {
   return {
     positions,
     turn: "red",
+    isFirst: true,
+    selcetedPiece: null,
+    indicators: [],
   };
 };
 

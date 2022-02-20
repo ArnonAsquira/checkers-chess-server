@@ -3,6 +3,7 @@ import app from "./app";
 import http from "http";
 import { port } from "./constants";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
+import handleLogic from "./socketLogic/gameLogic";
 
 const appPort = port || process.env.PORT;
 
@@ -17,7 +18,7 @@ const io = new Server(server, {
 const onConnection = (
   socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>
 ) => {
-  // generateGameRoom(io, socket);
+  handleLogic(io, socket);
 };
 
 io.on("connection", onConnection);
