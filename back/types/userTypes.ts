@@ -14,4 +14,4 @@ export interface UserFromDb {
   __v: number;
 }
 
-export type UserForToken = Pick<UserFromDb, "userName" | "email">;
+export type UserForToken = Pick<UserFromDb, "userName" | "email" | "_id">;

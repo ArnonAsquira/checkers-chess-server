@@ -27,12 +27,14 @@ const isCorrectPlayer = (
       )
     )
   ) {
+    console.log("selected piece is not of the current turns player");
     return false;
   }
   if (
     (gameObj.gameinfo.turn === colorOne && gameObj.playerOne !== player) ||
     (gameObj.gameinfo.turn === colorTwo && gameObj.playerTwo !== player)
   ) {
+    console.log(gameObj.gameinfo.turn, colorOne, gameObj.playerOne, player);
     return false;
   }
   return true;

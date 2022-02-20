@@ -17,7 +17,7 @@ const joinGame = (gameToken: string, userId: string): IFunctionResponse => {
     return makeFucntionResponse(true, JSON.stringify(gameobj), 200);
   }
   const newGameInfo = createNewGame();
-
+  console.log(userId);
   const newGameObj: IGameObject = {
     playerOne: userId,
     playerTwo: null,
