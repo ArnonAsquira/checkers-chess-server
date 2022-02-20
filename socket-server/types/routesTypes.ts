@@ -4,4 +4,10 @@ interface IFunctionResponse {
   status: number;
 }
 
-export type { IFunctionResponse };
+interface IUserFromToken {
+  userName: string;
+  email: string;
+  _id: string;
+}
+
+export type { IFunctionResponse, IUserFromToken };

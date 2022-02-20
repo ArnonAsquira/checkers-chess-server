@@ -31,10 +31,14 @@ const isCorrectPlayer = (
     return false;
   }
   if (
-    (gameObj.gameinfo.turn === colorOne && gameObj.playerOne !== player) ||
-    (gameObj.gameinfo.turn === colorTwo && gameObj.playerTwo !== player)
+    (gameObj.gameinfo.turn === colorOne &&
+      gameObj.playerOne !== null &&
+      gameObj.playerOne.id !== player) ||
+    (gameObj.gameinfo.turn === colorTwo &&
+      gameObj.playerTwo !== null &&
+      gameObj.playerTwo.id !== player)
   ) {
-    console.log(gameObj.gameinfo.turn, colorOne, gameObj.playerOne, player);
+    console.log("wrong user turn");
     return false;
   }
   return true;
@@ -44,6 +48,7 @@ const takeTurn = (indicator: IndicatorInfo, gameObj: IGameObject) => {
   if (gameObj.gameinfo.selcetedPiece === null) {
     return console.log("no piece selceted");
   }
+  // updating positions reflecting turn
   const newPositions = updatePositions(
     gameObj.gameinfo.turn,
     gameObj.gameinfo.selcetedPiece,
@@ -51,6 +56,8 @@ const takeTurn = (indicator: IndicatorInfo, gameObj: IGameObject) => {
     gameObj.gameinfo.positions
   );
   gameObj.gameinfo.positions = newPositions;
+  /*************************************************************************/
+  // checking for consecutive danger
   const newPieceInfo = gameObj.gameinfo.positions[gameObj.gameinfo.turn].find(
     (pieceInfo) => arrayEqual(indicator.location, pieceInfo.location)
   );
@@ -63,7 +70,7 @@ const takeTurn = (indicator: IndicatorInfo, gameObj: IGameObject) => {
     gameObj.gameinfo.turn,
     false
   ).filter((info) => info.endangers);
-  if (consecutiveDangerIndicators.length > 0) {
+  if (consecutiveDangerIndicators.length > 0 && indicator.endangers) {
     gameObj.gameinfo.isFirst = false;
     gameObj.gameinfo.selcetedPiece = newPieceInfo;
     gameObj.gameinfo.indicators = consecutiveDangerIndicators;

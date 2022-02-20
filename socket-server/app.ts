@@ -1,12 +1,14 @@
 import express from "express";
 import cors from "cors";
-import { port } from "./constants";
 import gameRouters from "./routers/gameRouters";
-
+import jwtAccesRouter from "./routers/jwtAccessRouter";
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
 app.use("/game", gameRouters);
+
+app.use("/jwtaccess", jwtAccesRouter);
+
 export default app;

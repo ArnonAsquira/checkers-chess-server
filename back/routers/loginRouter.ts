@@ -33,7 +33,7 @@ Router.post("/guest", (req, res, next) => {
   try {
     const guestDetails = uuidv4();
     const newGuest = {
-      userName: guestDetails,
+      userName: `guest ${guestDetails}`,
       email: guestDetails,
       _id: guestDetails,
     };

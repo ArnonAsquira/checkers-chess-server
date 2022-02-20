@@ -7,19 +7,22 @@ import makeFucntionResponse from "../generalUtils/functionResponse";
 import { IFunctionResponse } from "../../../types/routesTypes";
 import createNewGame from "../../../gameLogic/gameUtils/createNewGame";
 
-const joinGame = (gameToken: string, userId: string): IFunctionResponse => {
+const joinGame = (
+  gameToken: string,
+  userId: string,
+  userName: string
+): IFunctionResponse => {
   const gameobj = retrieveGameObject(gameToken);
   if (gameobj) {
     if (gameobj.playerTwo !== null) {
       return makeFucntionResponse(false, "game full", 403);
     }
-    gameobj.playerTwo = userId;
+    gameobj.playerTwo = { id: userId, userName };
     return makeFucntionResponse(true, JSON.stringify(gameobj), 200);
   }
   const newGameInfo = createNewGame();
-  console.log(userId);
   const newGameObj: IGameObject = {
-    playerOne: userId,
+    playerOne: { id: userId, userName },
     playerTwo: null,
     gameId: gameToken,
     gameinfo: newGameInfo,

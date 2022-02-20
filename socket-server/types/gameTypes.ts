@@ -1,6 +1,6 @@
 interface IGameObject {
-  playerOne: string | null;
-  playerTwo: string | null;
+  playerOne: { id: string; userName: string } | null;
+  playerTwo: { id: string; userName: string } | null;
   gameId: string;
   gameinfo: IGameInfo;
 }
@@ -11,6 +11,13 @@ interface IGameInfo {
   isFirst: boolean;
   selcetedPiece: IPieceInfoObject | null;
   indicators: IndicatorInfo[];
+}
+
+interface IParsedGameObject {
+  playerOne: { userName: string; id?: string } | null;
+  playerTwo: { userName: string } | null;
+  gameId: string;
+  gameinfo: IGameInfo;
 }
 
 interface IndicatorInfo {
@@ -58,4 +65,5 @@ export type {
   PlatyerColors,
   IGameObject,
   IGameInfo,
+  IParsedGameObject,
 };
