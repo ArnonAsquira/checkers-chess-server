@@ -1,8 +1,6 @@
-import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
 import { RequestHandler } from "express";
 import * as config from "../utils/environmentVars";
-import { IUserFromToken } from "../types/routesTypes";
 
 const secret: string = config.SECRET;
 

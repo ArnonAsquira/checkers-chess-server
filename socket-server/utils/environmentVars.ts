@@ -1,6 +1,9 @@
-import * as dotenv from "dotenv";
-dotenv.config({ path: __dirname + "/.env" });
+import "dotenv/config";
 
-const SECRET: string = process.env.SECRET || "123";
+const SECRET: string =
+  process.env.SECRET === undefined ? "123" : process.env.SECRET;
 
-export { SECRET };
+const MONGO_URI: string =
+  process.env.MONGO_URL === undefined ? "123" : process.env.MONGO_URL;
+
+export { SECRET, MONGO_URI };

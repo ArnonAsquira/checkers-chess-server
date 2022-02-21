@@ -8,8 +8,23 @@ import {
   IndicatorInfo,
   IPieceInfoObject,
 } from "../types/gameTypes";
-import { retrieveGameObject } from "../userManegement/gameHandeling";
-import { isCorrectPlayer, takeTurn } from "./utils";
+import {
+  removeGame,
+  retrieveGameObject,
+} from "../userManegement/gameHandeling";
+import {
+  isCorrectPlayer,
+  playerNum,
+  takeTurn,
+  updateGameResualts,
+} from "./utils";
+import {
+  pushToSocket,
+  removeScoket,
+  retrieveSocket,
+  retrieveUserId,
+  socketArray,
+} from "./socketArray";
 
 interface ISocketMiddlewareResponse<T> {
   success: boolean;
@@ -27,7 +42,7 @@ const validateGame = (
 ): ISocketMiddlewareResponse<string | IGameObject> => {
   const gameObj = retrieveGameObject(gameId);
   if (!gameObj) {
-    socket.emit("game does not exist", new Error("game does not exist"));
+    socket.emit("err", new Error("game does not exist"));
     return makeMiddlewareResponse(false, "game object doesnt exist");
   }
   return makeMiddlewareResponse(true, gameObj);
@@ -37,14 +52,36 @@ const handleLogic = (
   io: Server<DefaultEventsMap, DefaultEventsMap>,
   socket: Socket<DefaultEventsMap, DefaultEventsMap>
 ) => {
-  socket.on("join game", (gameId) => {
+  const socketId = socket.id;
+  let globalGameId: string | null = null;
+
+  socket.on("join game", (gameId, userId) => {
     const gameObjectResponse = validateGame(socket, gameId);
+    globalGameId = gameId;
     if (!gameObjectResponse.success) return;
     const gameObj = gameObjectResponse.message as IGameObject;
+    pushToSocket({ socketId, userId, socket });
     socket.join(gameId);
     socket
       .to(gameId)
       .emit("joined game", gameObj.playerTwo && gameObj.playerTwo.userName);
+  });
+
+  socket.on("disconnect", () => {
+    // console.log({ globalGameId });
+    if (globalGameId !== null) {
+      const gameObjectResponse = validateGame(socket, globalGameId);
+      if (!gameObjectResponse.success) return;
+      const gameObj = gameObjectResponse.message as IGameObject;
+      const playerId = retrieveUserId(socketId);
+      if (!playerId) return;
+      const playerNumber = playerNum(gameObj, playerId);
+      updateGameResualts(playerNumber, gameObj);
+      socket.to(globalGameId).emit("player disconnected", playerNumber);
+      removeGame(globalGameId);
+      removeScoket(playerId);
+      globalGameId = null;
+    }
   });
 
   socket.on(
@@ -53,9 +90,12 @@ const handleLogic = (
       const gameObjectResponse = validateGame(socket, gameId);
       if (!gameObjectResponse.success) return;
       const gameObj = gameObjectResponse.message as IGameObject;
+      if (gameObj.playerTwo === null) {
+        return socket.to(gameId).emit("err", "game is not full");
+      }
       if (!isCorrectPlayer(piece, userId, gameObj)) {
         console.log("incorrect player");
-        return socket.emit("incorrect player", new Error("incorrect player"));
+        return socket.emit("err", new Error("incorrect player"));
       }
       gameObj.gameinfo.selcetedPiece = piece;
       const positions = gameObj.gameinfo.positions;

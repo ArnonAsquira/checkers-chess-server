@@ -17,8 +17,8 @@ const UserScema = new mongoose.Schema({
   },
   checkersData: {
     type: {
-      wins: Array,
-      loses: Array,
+      wins: [String],
+      loses: [String],
     },
     default: {
       wins: [],
@@ -27,4 +27,4 @@ const UserScema = new mongoose.Schema({
   },
 });
 
-export const User = mongoose.model("user", UserScema);
+export const User = mongoose.model("user", UserScema, "users");

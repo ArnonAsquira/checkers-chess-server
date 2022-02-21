@@ -6,13 +6,24 @@ import arrayEqual, {
   arrayIncludes,
 } from "../gameLogic/generalUtils/arrayEqual";
 import oppositeColor from "../gameLogic/generalUtils/oppositeColor";
+import { User } from "../mongo/userSchema";
 import {
-  IBoardPositions,
-  IGameInfo,
   IGameObject,
   IndicatorInfo,
   IPieceInfoObject,
 } from "../types/gameTypes";
+import mongoose from "mongoose";
+const ObjectId = mongoose.Types.ObjectId;
+
+const playerNum = (gameObj: IGameObject, userId: string) => {
+  if (gameObj.playerOne && gameObj.playerOne.id === userId) {
+    return 1;
+  }
+  if (gameObj.playerTwo && gameObj.playerTwo.id === userId) {
+    return 2;
+  }
+  return 0;
+};
 
 const isCorrectPlayer = (
   piece: IPieceInfoObject,
@@ -90,4 +101,31 @@ const takeTurn = (indicator: IndicatorInfo, gameObj: IGameObject) => {
   }
 };
 
-export { isCorrectPlayer, takeTurn };
+const updateVictory = async (userId: string, opponentId: string) => {
+  await User.updateOne(
+    { _id: new ObjectId(userId) },
+    { $push: { "checkersData.wins": opponentId } }
+  );
+};
+
+const updateLose = async (userId: string, opponentId: string) => {
+  await User.updateOne(
+    { _id: new ObjectId(userId) },
+    { $push: { "checkersData.loses": opponentId } }
+  );
+};
+
+const updateGameResualts = (loserNumber: number, gameObj: IGameObject) => {
+  if (!gameObj.playerTwo || !gameObj.playerOne) {
+    console.log({ gameObj });
+    return;
+  }
+  const winnerId =
+    loserNumber === 1 ? gameObj.playerTwo.id : gameObj.playerOne.id;
+  const loserId =
+    loserNumber === 1 ? gameObj.playerOne.id : gameObj.playerTwo.id;
+  updateVictory(winnerId, loserId);
+  updateLose(loserId, winnerId);
+};
+
+export { isCorrectPlayer, takeTurn, playerNum, updateGameResualts };

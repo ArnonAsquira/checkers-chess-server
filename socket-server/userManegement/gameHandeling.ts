@@ -27,7 +27,6 @@ const removeGame = (gameToken: string): boolean => {
   currentGames.splice(gameIndex, 1);
   return true;
 };
-// const updateGames = (gameToken: string) => {};
 
 const retrieveGameObject = (gameToken: string): IGameObject | undefined => {
   return currentGames.find((gameObj) => gameObj.gameId === gameToken);
