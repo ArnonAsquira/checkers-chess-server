@@ -117,7 +117,6 @@ const updateLose = async (userId: string, opponentId: string) => {
 
 const updateGameResualts = (loserNumber: number, gameObj: IGameObject) => {
   if (!gameObj.playerTwo || !gameObj.playerOne) {
-    console.log({ gameObj });
     return;
   }
   const winnerId =
