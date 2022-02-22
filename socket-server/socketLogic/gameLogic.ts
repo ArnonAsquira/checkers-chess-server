@@ -13,7 +13,11 @@ import {
   retrieveGameObject,
 } from "../userManegement/gameHandeling";
 import {
+  checkeVictory,
+  handleTimer,
+  handleWin,
   isCorrectPlayer,
+  isValidPiece,
   playerNum,
   takeTurn,
   updateGameResualts,
@@ -64,11 +68,22 @@ const handleLogic = (
     socket.join(gameId);
     socket
       .to(gameId)
-      .emit("joined game", gameObj.playerTwo && gameObj.playerTwo.userName);
+      .emit(
+        "joined game",
+        gameObj.playerTwo && gameObj.playerTwo.userName,
+        gameObj.playerTwo && gameObj.playerTwo.timer.time
+      );
+    if (gameObj.playerOne && gameObj.playerTwo) {
+      const playerOneSocket = retrieveSocket(gameObj.playerOne.id);
+      const playerTwoScoket = retrieveSocket(gameObj.playerTwo.id);
+      if (playerOneSocket && playerTwoScoket) {
+        handleTimer(gameObj, playerOneSocket);
+        handleTimer(gameObj, playerTwoScoket);
+      }
+    }
   });
 
   socket.on("disconnect", () => {
-    // console.log({ globalGameId });
     if (globalGameId !== null) {
       const gameObjectResponse = validateGame(socket, globalGameId);
       if (!gameObjectResponse.success) return;
@@ -97,7 +112,14 @@ const handleLogic = (
         console.log("incorrect player");
         return socket.emit("err", new Error("incorrect player"));
       }
-      gameObj.gameinfo.selcetedPiece = piece;
+      if (isValidPiece(piece, gameObj.gameinfo)) {
+        gameObj.gameinfo.selcetedPiece = piece;
+      } else {
+        return socket.emit("err", "you cant use this piece in this turn");
+      }
+      if (gameObj.gameinfo.mandatoryMove.length > 0) {
+        return socket.emit("indicators", gameObj.gameinfo.mandatoryMove, piece);
+      }
       const positions = gameObj.gameinfo.positions;
       const turn = gameObj.gameinfo.turn;
       const indicators = indicatorLocations(piece, positions, turn, true);
@@ -117,7 +139,11 @@ const handleLogic = (
         return socket.emit("please select a piece");
       }
       takeTurn(indicator, gameObj);
+      const winner = checkeVictory(gameObj.gameinfo);
       io.in(gameId).emit("new game object", gameObj.gameinfo);
+      if (winner !== 0) {
+        handleWin(gameObj, winner === 1 ? 2 : 1);
+      }
     }
   );
 };

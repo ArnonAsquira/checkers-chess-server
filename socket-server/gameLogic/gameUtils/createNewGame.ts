@@ -9,6 +9,7 @@ const createNewGame = (): IGameInfo => {
     isFirst: true,
     selcetedPiece: null,
     indicators: [],
+    mandatoryMove: [],
   };
 };
 

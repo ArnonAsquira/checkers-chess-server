@@ -8,18 +8,82 @@ import arrayEqual, {
 import oppositeColor from "../gameLogic/generalUtils/oppositeColor";
 import { User } from "../mongo/userSchema";
 import {
+  IGameInfo,
   IGameObject,
   IndicatorInfo,
   IPieceInfoObject,
 } from "../types/gameTypes";
 import mongoose from "mongoose";
+import { removeGame } from "../userManegement/gameHandeling";
+import { retrieveSocket, socketArray } from "./socketArray";
+import { Socket } from "socket.io";
+import { DefaultEventsMap } from "socket.io/dist/typed-events";
+import { wait } from "../gameLogic/timer/timer";
 const ObjectId = mongoose.Types.ObjectId;
+
+const switchTimer = (gameObj: IGameObject, playerNumber: 1 | 2) => {
+  if (!gameObj.playerOne || !gameObj.playerTwo) return;
+  if (playerNumber === 1) {
+    if (!gameObj.playerOne.timer.acitvated) {
+      gameObj.playerOne.timer.activate();
+    }
+    if (gameObj.playerTwo.timer.acitvated) {
+      gameObj.playerTwo.timer.stop();
+    }
+  } else {
+    if (!gameObj.playerTwo.timer.acitvated) {
+      gameObj.playerTwo.timer.activate();
+    }
+    if (gameObj.playerOne.timer.acitvated) {
+      gameObj.playerOne.timer.stop();
+    }
+  }
+};
+
+const handleTimer = async (
+  gameObj: IGameObject,
+  socket: Socket<DefaultEventsMap, DefaultEventsMap>
+) => {
+  let count = 0;
+  while (gameObj.playerOne && gameObj.playerTwo) {
+    await wait(1);
+    socket.emit("update time", {
+      playerOne: gameObj.playerOne.timer.time,
+      playerTwo: gameObj.playerTwo.timer.time,
+    });
+    if (gameObj.playerOne.timer.time === 0) {
+      handleWin(gameObj, 1);
+    } else if (gameObj.playerTwo.timer.time === 0) {
+      handleWin(gameObj, 2);
+    }
+    if (count === 0) {
+      console.log({ socket: socket.id });
+    }
+    count++;
+  }
+};
 
 const playerNum = (gameObj: IGameObject, userId: string) => {
   if (gameObj.playerOne && gameObj.playerOne.id === userId) {
     return 1;
   }
   if (gameObj.playerTwo && gameObj.playerTwo.id === userId) {
+    return 2;
+  }
+  return 0;
+};
+
+const checkeVictory = (gameinfo: IGameInfo): 1 | 2 | 0 => {
+  if (
+    gameinfo.positions.red.length > 0 &&
+    gameinfo.positions.blue.length === 0
+  ) {
+    return 1;
+  }
+  if (
+    gameinfo.positions.blue.length > 0 &&
+    gameinfo.positions.red.length === 0
+  ) {
     return 2;
   }
   return 0;
@@ -85,6 +149,7 @@ const takeTurn = (indicator: IndicatorInfo, gameObj: IGameObject) => {
     gameObj.gameinfo.isFirst = false;
     gameObj.gameinfo.selcetedPiece = newPieceInfo;
     gameObj.gameinfo.indicators = consecutiveDangerIndicators;
+    gameObj.gameinfo.mandatoryMove = consecutiveDangerIndicators;
     return;
   } else {
     gameObj.gameinfo.turn = oppositeColor(gameObj.gameinfo.turn);
@@ -93,25 +158,42 @@ const takeTurn = (indicator: IndicatorInfo, gameObj: IGameObject) => {
       gameObj.gameinfo.turn
     );
     if (mandatoryMoves.length > 0) {
+      gameObj.gameinfo.mandatoryMove = mandatoryMoves;
       gameObj.gameinfo.indicators = mandatoryMoves;
     } else {
       gameObj.gameinfo.indicators = [];
+      gameObj.gameinfo.mandatoryMove = [];
     }
     gameObj.gameinfo.selcetedPiece = null;
   }
+  switchTimer(gameObj, gameObj.gameinfo.turn === "red" ? 1 : 2);
 };
 
 const updateVictory = async (userId: string, opponentId: string) => {
   await User.updateOne(
     { _id: new ObjectId(userId) },
-    { $push: { "checkersData.wins": opponentId } }
+    {
+      $push: {
+        "checkersData.wins": {
+          id: opponentId,
+          date: new Date().toString(),
+        },
+      },
+    }
   );
 };
 
 const updateLose = async (userId: string, opponentId: string) => {
   await User.updateOne(
     { _id: new ObjectId(userId) },
-    { $push: { "checkersData.loses": opponentId } }
+    {
+      $push: {
+        "checkersData.loses": {
+          id: opponentId,
+          date: new Date().toString(),
+        },
+      },
+    }
   );
 };
 
@@ -127,4 +209,51 @@ const updateGameResualts = (loserNumber: number, gameObj: IGameObject) => {
   updateLose(loserId, winnerId);
 };
 
-export { isCorrectPlayer, takeTurn, playerNum, updateGameResualts };
+const handleWin = (gameObj: IGameObject, loserNum: 1 | 2) => {
+  updateGameResualts(loserNum, gameObj);
+  if (!gameObj.playerOne || !gameObj.playerTwo)
+    return console.log("undefined players");
+  const winnerId = loserNum === 1 ? gameObj.playerTwo.id : gameObj.playerOne.id;
+  const loserId = loserNum === 1 ? gameObj.playerOne.id : gameObj.playerTwo.id;
+  const winnerSocket = retrieveSocket(winnerId);
+  winnerSocket && winnerSocket.emit("winner", 1);
+  const loserSocket = retrieveSocket(loserId);
+  loserSocket && loserSocket.emit("loser", 1);
+  removeGame(gameObj.gameId);
+};
+
+const isValidPiece = (
+  pieceInfo: IPieceInfoObject,
+  gameinfo: IGameInfo
+): boolean => {
+  let isValid = false;
+  if (gameinfo.mandatoryMove.length < 1) return true;
+  const pieceIndicators = indicatorLocations(
+    pieceInfo,
+    gameinfo.positions,
+    gameinfo.turn,
+    gameinfo.isFirst
+  );
+  for (const indicator of pieceIndicators) {
+    for (const move of gameinfo.mandatoryMove) {
+      if (
+        arrayEqual(move.location, indicator.location) &&
+        indicator.endangers
+      ) {
+        isValid = true;
+      }
+    }
+  }
+  return isValid;
+};
+
+export {
+  isCorrectPlayer,
+  takeTurn,
+  playerNum,
+  updateGameResualts,
+  handleWin,
+  checkeVictory,
+  isValidPiece,
+  handleTimer,
+};

@@ -1,6 +1,8 @@
+import Timer from "../gameLogic/timer/timer";
+
 interface IGameObject {
-  playerOne: { id: string; userName: string } | null;
-  playerTwo: { id: string; userName: string } | null;
+  playerOne: { id: string; userName: string; timer: Timer } | null;
+  playerTwo: { id: string; userName: string; timer: Timer } | null;
   gameId: string;
   gameinfo: IGameInfo;
 }
@@ -10,12 +12,13 @@ interface IGameInfo {
   turn: PlatyerColors;
   isFirst: boolean;
   selcetedPiece: IPieceInfoObject | null;
+  mandatoryMove: IndicatorInfo[];
   indicators: IndicatorInfo[];
 }
 
 interface IParsedGameObject {
-  playerOne: { userName: string; id?: string } | null;
-  playerTwo: { userName: string } | null;
+  playerOne: { userName: string; id?: string; time: number } | null;
+  playerTwo: { userName: string; time: number } | null;
   gameId: string;
   gameinfo: IGameInfo;
 }

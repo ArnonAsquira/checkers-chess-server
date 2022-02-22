@@ -5,10 +5,18 @@ const parseGameObject = (gameObj: IGameObject): IParsedGameObject => {
     gameObj.playerOne == null
       ? null
       : gameObj.playerTwo === null
-      ? gameObj.playerOne
-      : { userName: gameObj.playerOne.userName };
+      ? { ...gameObj.playerOne, time: gameObj.playerOne.timer.time }
+      : {
+          userName: gameObj.playerOne.userName,
+          time: gameObj.playerOne.timer.time,
+        };
   const playerTwoData =
-    gameObj.playerTwo == null ? null : { userName: gameObj.playerTwo.userName };
+    gameObj.playerTwo == null
+      ? null
+      : {
+          userName: gameObj.playerTwo.userName,
+          time: gameObj.playerTwo.timer.time,
+        };
   return {
     ...gameObj,
     playerOne: playerOneData,
