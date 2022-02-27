@@ -18,6 +18,13 @@ const joinGame = (
     if (gameobj.playerTwo !== null) {
       return makeFucntionResponse(false, "game full", 403);
     }
+    if (gameobj.playerOne && gameobj.playerOne.id === userId) {
+      return makeFucntionResponse(
+        false,
+        "you cant join the same game twice",
+        403
+      );
+    }
     gameobj.playerTwo = { id: userId, userName, timer: new Timer(600) };
     return makeFucntionResponse(true, JSON.stringify(gameobj), 200);
   }

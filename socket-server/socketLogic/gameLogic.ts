@@ -29,6 +29,7 @@ import {
   retrieveUserId,
   socketArray,
 } from "./socketArray";
+import { IUserFromToken } from "../types/routesTypes";
 
 interface ISocketMiddlewareResponse<T> {
   success: boolean;
@@ -54,7 +55,8 @@ const validateGame = (
 
 const handleLogic = (
   io: Server<DefaultEventsMap, DefaultEventsMap>,
-  socket: Socket<DefaultEventsMap, DefaultEventsMap>
+  socket: Socket<DefaultEventsMap, DefaultEventsMap>,
+  user: IUserFromToken
 ) => {
   const socketId = socket.id;
   let globalGameId: string | null = null;

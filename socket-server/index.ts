@@ -4,6 +4,12 @@ import http from "http";
 import { port } from "./constants";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import handleLogic from "./socketLogic/gameLogic";
+import {
+  authenticateToken,
+  authenticateTokenFunc,
+} from "./middlewares/validateSchema";
+import { IUserFromToken } from "./types/routesTypes";
+import handleChatLogic from "./socketLogic/chatLogic";
 
 const appPort = port || process.env.PORT;
 
@@ -18,7 +24,13 @@ const io = new Server(server, {
 const onConnection = (
   socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>
 ) => {
-  handleLogic(io, socket);
+  const token = socket.handshake.auth.token;
+  const user: IUserFromToken | false = authenticateTokenFunc(token);
+  if (!user) {
+    return socket.emit("err", "failed authenticating user");
+  }
+  handleLogic(io, socket, user);
+  handleChatLogic(socket, io, user);
 };
 
 io.on("connection", onConnection);
