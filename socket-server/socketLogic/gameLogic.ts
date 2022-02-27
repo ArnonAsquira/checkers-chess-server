@@ -79,8 +79,8 @@ const handleLogic = (
       const playerOneSocket = retrieveSocket(gameObj.playerOne.id);
       const playerTwoScoket = retrieveSocket(gameObj.playerTwo.id);
       if (playerOneSocket && playerTwoScoket) {
-        handleTimer(gameObj, playerOneSocket);
-        handleTimer(gameObj, playerTwoScoket);
+        handleTimer(gameId, playerOneSocket);
+        handleTimer(gameId, playerTwoScoket);
       }
     }
   });

@@ -7,7 +7,6 @@ import makeFucntionResponse from "../generalUtils/functionResponse";
 
 const logOutOfGame = (gameObj: IGameObject, userId: string, gameId: string) => {
   if (gameObj.playerOne !== null && gameObj.playerTwo !== null) {
-    console.log(`${userId} has lost the game`);
     removeGame(gameId);
     return makeFucntionResponse(true, `${userId} has lost the game`, 200);
   }

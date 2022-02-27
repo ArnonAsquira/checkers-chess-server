@@ -14,7 +14,10 @@ import {
   IPieceInfoObject,
 } from "../types/gameTypes";
 import mongoose from "mongoose";
-import { removeGame } from "../userManegement/gameHandeling";
+import {
+  removeGame,
+  retrieveGameObject,
+} from "../userManegement/gameHandeling";
 import { retrieveSocket, socketArray } from "./socketArray";
 import { Socket } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
@@ -41,11 +44,17 @@ const switchTimer = (gameObj: IGameObject, playerNumber: 1 | 2) => {
 };
 
 const handleTimer = async (
-  gameObj: IGameObject,
+  gameId: string,
   socket: Socket<DefaultEventsMap, DefaultEventsMap>
 ) => {
-  let count = 0;
-  while (gameObj.playerOne && gameObj.playerTwo) {
+  let gameObj = retrieveGameObject(gameId);
+  while (
+    gameObj &&
+    gameObj.playerOne &&
+    gameObj.playerOne.id &&
+    gameObj.playerTwo &&
+    gameObj.playerTwo.id
+  ) {
     await wait(1);
     socket.emit("update time", {
       playerOne: gameObj.playerOne.timer.time,
@@ -56,9 +65,7 @@ const handleTimer = async (
     } else if (gameObj.playerTwo.timer.time === 0) {
       handleWin(gameObj, 2);
     }
-    if (count === 0) {
-    }
-    count++;
+    gameObj = retrieveGameObject(gameId);
   }
 };
 
