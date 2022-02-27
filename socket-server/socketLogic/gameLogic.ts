@@ -46,7 +46,7 @@ const validateGame = (
 ): ISocketMiddlewareResponse<string | IGameObject> => {
   const gameObj = retrieveGameObject(gameId);
   if (!gameObj) {
-    socket.emit("err", new Error("game does not exist"));
+    socket.emit("err", "game does not exist");
     return makeMiddlewareResponse(false, "game object doesnt exist");
   }
   return makeMiddlewareResponse(true, gameObj);
@@ -110,15 +110,12 @@ const handleLogic = (
       }
       if (!isCorrectPlayer(piece, userId, gameObj)) {
         console.log("incorrect player");
-        return socket.emit("err", new Error("incorrect player"));
+        return socket.emit("err", "incorrect player");
       }
       if (isValidPiece(piece, gameObj.gameinfo)) {
         gameObj.gameinfo.selcetedPiece = piece;
       } else {
         return socket.emit("err", "you cant use this piece in this turn");
-      }
-      if (gameObj.gameinfo.mandatoryMove.length > 0) {
-        return socket.emit("indicators", gameObj.gameinfo.mandatoryMove, piece);
       }
       const positions = gameObj.gameinfo.positions;
       const turn = gameObj.gameinfo.turn;

@@ -17,8 +17,18 @@ const UserScema = new mongoose.Schema({
   },
   checkersData: {
     type: {
-      wins: [{ id: String, date: Date }],
-      loses: [{ id: String, date: Date }],
+      wins: [
+        {
+          id: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+          date: Date,
+        },
+      ],
+      loses: [
+        {
+          id: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+          date: Date,
+        },
+      ],
     },
     default: {
       wins: [],

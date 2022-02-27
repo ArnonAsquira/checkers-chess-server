@@ -57,7 +57,6 @@ const handleTimer = async (
       handleWin(gameObj, 2);
     }
     if (count === 0) {
-      console.log({ socket: socket.id });
     }
     count++;
   }
@@ -175,7 +174,7 @@ const updateVictory = async (userId: string, opponentId: string) => {
     {
       $push: {
         "checkersData.wins": {
-          id: opponentId,
+          id: new ObjectId(opponentId),
           date: new Date().toString(),
         },
       },
@@ -189,7 +188,7 @@ const updateLose = async (userId: string, opponentId: string) => {
     {
       $push: {
         "checkersData.loses": {
-          id: opponentId,
+          id: new ObjectId(opponentId),
           date: new Date().toString(),
         },
       },

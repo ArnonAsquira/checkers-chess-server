@@ -7,12 +7,18 @@ const ObjectId = mongoose.Types.ObjectId;
 
 router.get("/", authenticateToken, async (req, res) => {
   const user = res.locals.user;
-
-  const statistics = await User.findOne(
-    { _id: new ObjectId(user._id) },
-    { checkersData: 1 }
-  );
-  return res.send(statistics);
+  try {
+    const statistics = await User.findOne(
+      { _id: new ObjectId(user._id) },
+      { checkersData: 1 }
+    )
+      .populate("checkersData.wins.id", "userName")
+      .populate("checkersData.loses.id", "userName");
+    return res.send(statistics);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
 });
 
 export default router;
