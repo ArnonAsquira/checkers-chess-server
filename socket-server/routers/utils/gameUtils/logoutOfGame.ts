@@ -1,11 +1,11 @@
 import { IGameObject } from "../../../types/gameTypes";
-import {
-  removeGame,
-  retrieveGameObject,
-} from "../../../userManegement/gameHandeling";
+import { removeGame } from "../../../userManegement/gameHandeling";
 import makeFucntionResponse from "../generalUtils/functionResponse";
+import { retrieveSocket, socketArray } from "../../../socketLogic/socketArray";
 
 const logOutOfGame = (gameObj: IGameObject, userId: string, gameId: string) => {
+  const userSocket = retrieveSocket(userId);
+  userSocket && userSocket.leave(gameId);
   if (gameObj.playerOne !== null && gameObj.playerTwo !== null) {
     removeGame(gameId);
     return makeFucntionResponse(true, `${userId} has lost the game`, 200);

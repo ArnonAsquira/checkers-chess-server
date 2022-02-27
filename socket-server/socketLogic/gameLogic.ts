@@ -21,6 +21,7 @@ import {
   playerNum,
   takeTurn,
   updateGameResualts,
+  validatePlayersTurn,
 } from "./utils";
 import {
   pushToSocket,
@@ -30,6 +31,10 @@ import {
   socketArray,
 } from "./socketArray";
 import { IUserFromToken } from "../types/routesTypes";
+import {
+  incomingSocketEvents,
+  outGoingSocketEvents,
+} from "./constants/socketEvents";
 
 interface ISocketMiddlewareResponse<T> {
   success: boolean;
@@ -61,7 +66,7 @@ const handleLogic = (
   const socketId = socket.id;
   let globalGameId: string | null = null;
 
-  socket.on("join game", (gameId, userId) => {
+  socket.on(incomingSocketEvents.joinGame, (gameId, userId) => {
     const gameObjectResponse = validateGame(socket, gameId);
     globalGameId = gameId;
     if (!gameObjectResponse.success) return;
@@ -71,7 +76,7 @@ const handleLogic = (
     socket
       .to(gameId)
       .emit(
-        "joined game",
+        outGoingSocketEvents.joinedGame,
         gameObj.playerTwo && gameObj.playerTwo.userName,
         gameObj.playerTwo && gameObj.playerTwo.timer.time
       );
@@ -94,7 +99,9 @@ const handleLogic = (
       if (!playerId) return;
       const playerNumber = playerNum(gameObj, playerId);
       updateGameResualts(playerNumber, gameObj);
-      socket.to(globalGameId).emit("player disconnected", playerNumber);
+      socket
+        .to(globalGameId)
+        .emit(outGoingSocketEvents.playerDisconnected, playerNumber);
       removeGame(globalGameId);
       removeScoket(playerId);
       globalGameId = null;
@@ -102,40 +109,46 @@ const handleLogic = (
   });
 
   socket.on(
-    "select piece",
+    incomingSocketEvents.selectPiece,
     (piece: IPieceInfoObject, gameId: string, userId: string) => {
       const gameObjectResponse = validateGame(socket, gameId);
       if (!gameObjectResponse.success) return;
       const gameObj = gameObjectResponse.message as IGameObject;
       if (gameObj.playerTwo === null) {
-        return socket.to(gameId).emit("err", "game is not full");
+        return socket
+          .to(gameId)
+          .emit(outGoingSocketEvents.error, "game is not full");
       }
       if (!isCorrectPlayer(piece, userId, gameObj)) {
-        console.log("incorrect player");
-        return socket.emit("err", "incorrect player");
+        return socket.emit(outGoingSocketEvents.error, "incorrect player");
       }
       if (isValidPiece(piece, gameObj.gameinfo)) {
         gameObj.gameinfo.selcetedPiece = piece;
       } else {
-        return socket.emit("err", "you cant use this piece in this turn");
+        return socket.emit(
+          outGoingSocketEvents.error,
+          "you cant use this piece in this turn"
+        );
       }
       const positions = gameObj.gameinfo.positions;
       const turn = gameObj.gameinfo.turn;
       const indicators = indicatorLocations(piece, positions, turn, true);
       gameObj.gameinfo.indicators = indicators;
-      return socket.emit("indicators", indicators, piece);
+      return socket.emit(outGoingSocketEvents.indicators, indicators, piece);
     }
   );
 
   socket.on(
-    "take turn",
-    (indicator: IndicatorInfo, gameId: string, userId: string) => {
+    incomingSocketEvents.takeTurn,
+    (indicator: IndicatorInfo, gameId: string) => {
       const gameObjectResponse = validateGame(socket, gameId);
       if (!gameObjectResponse.success) return;
       const gameObj = gameObjectResponse.message as IGameObject;
       if (gameObj.gameinfo.selcetedPiece === null) {
-        console.log("no selected piece");
-        return socket.emit("please select a piece");
+        return socket.emit(outGoingSocketEvents.error, "please select a piece");
+      }
+      if (!validatePlayersTurn(user._id, gameObj)) {
+        return socket.emit("err", "this is not your turn");
       }
       takeTurn(indicator, gameObj);
       const winner = checkeVictory(gameObj.gameinfo);

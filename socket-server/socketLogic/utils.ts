@@ -95,6 +95,20 @@ const checkeVictory = (gameinfo: IGameInfo): 1 | 2 | 0 => {
   return 0;
 };
 
+const validatePlayersTurn = (playerId: string, gameObj: IGameObject) => {
+  if (
+    (gameObj.gameinfo.turn === colorOne &&
+      gameObj.playerOne !== null &&
+      gameObj.playerOne.id !== playerId) ||
+    (gameObj.gameinfo.turn === colorTwo &&
+      gameObj.playerTwo !== null &&
+      gameObj.playerTwo.id !== playerId)
+  ) {
+    return false;
+  }
+  return true;
+};
+
 const isCorrectPlayer = (
   piece: IPieceInfoObject,
   player: string,
@@ -108,21 +122,9 @@ const isCorrectPlayer = (
       )
     )
   ) {
-    console.log("selected piece is not of the current turns player");
     return false;
   }
-  if (
-    (gameObj.gameinfo.turn === colorOne &&
-      gameObj.playerOne !== null &&
-      gameObj.playerOne.id !== player) ||
-    (gameObj.gameinfo.turn === colorTwo &&
-      gameObj.playerTwo !== null &&
-      gameObj.playerTwo.id !== player)
-  ) {
-    console.log("wrong user turn");
-    return false;
-  }
-  return true;
+  return validatePlayersTurn(player, gameObj);
 };
 
 const takeTurn = (indicator: IndicatorInfo, gameObj: IGameObject) => {
@@ -262,4 +264,5 @@ export {
   checkeVictory,
   isValidPiece,
   handleTimer,
+  validatePlayersTurn,
 };
