@@ -4,14 +4,11 @@ import http from "http";
 import { port } from "./constants";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import handleLogic from "./socketLogic/gameLogic";
-import {
-  authenticateToken,
-  authenticateTokenFunc,
-} from "./middlewares/validateSchema";
+import { authenticateTokenFunc } from "./middlewares/validateSchema";
 import { IUserFromToken } from "./types/routesTypes";
 import handleChatLogic from "./socketLogic/chatLogic";
 
-const appPort = port || process.env.PORT;
+const appPort = process.env.PORT || port;
 
 const server = http.createServer(app);
 
