@@ -35,6 +35,10 @@ const UserScema = new mongoose.Schema({
       loses: [],
     },
   },
+  styleCustomization: {
+    background: String,
+    logo: String,
+  },
 });
 
 export const User = mongoose.model("user", UserScema, "users");

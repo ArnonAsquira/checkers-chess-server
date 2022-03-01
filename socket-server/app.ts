@@ -3,6 +3,7 @@ import cors from "cors";
 import gameRouters from "./routers/gameRouters";
 import jwtAccesRouter from "./routers/jwtAccessRouter";
 import statsRouter from "./routers/statisticsRoutes";
+import customizationRouter from "./routers/customizationRouters";
 import mongoose from "mongoose";
 import * as config from "./utils/environmentVars";
 
@@ -18,5 +19,7 @@ app.use("/game", gameRouters);
 app.use("/jwtaccess", jwtAccesRouter);
 
 app.use("/statistics", statsRouter);
+
+app.use("/customize", customizationRouter);
 
 export default app;
