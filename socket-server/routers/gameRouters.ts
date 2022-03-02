@@ -102,4 +102,21 @@ router.post("/logout", authenticateToken, (req, res) => {
   return res.status(logOutResponse.status).send(logOutResponse.message);
 });
 
+router.post("/invite", authenticateToken, async (req, res) => {
+  const body = req.body;
+  if (!body.gameToken || !body.userEmail) {
+    return res.status(403).send("request must contain userEmail and gameToken");
+  }
+  const inviteeInfo = await User.findOne({ email: body.userEmail });
+  if (!inviteeInfo) {
+    return res.status(403).send("user does not exist");
+  }
+  const inviteeSocket = retrieveSocket(inviteeInfo._id.toString());
+  if (!inviteeSocket) {
+    return res.status(404).send("user not connected");
+  }
+  inviteeSocket.emit("invited", body.gameToken, res.locals.user.userName);
+  return res.send("invitation sent");
+});
+
 export default router;

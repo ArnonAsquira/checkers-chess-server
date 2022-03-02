@@ -65,13 +65,13 @@ const handleLogic = (
 ) => {
   const socketId = socket.id;
   let globalGameId: string | null = null;
-
+  pushToSocket({ socketId, userId: user._id, socket });
   socket.on(incomingSocketEvents.joinGame, (gameId, userId) => {
     const gameObjectResponse = validateGame(socket, gameId);
     globalGameId = gameId;
     if (!gameObjectResponse.success) return;
     const gameObj = gameObjectResponse.message as IGameObject;
-    pushToSocket({ socketId, userId, socket });
+    // pushToSocket({ socketId, userId, socket });
     socket.join(gameId);
     socket
       .to(gameId)
