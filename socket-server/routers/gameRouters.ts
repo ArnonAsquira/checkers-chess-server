@@ -1,18 +1,19 @@
 import express, { json } from "express";
+import mongoose from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 import { authenticateToken } from "../middlewares/validateSchema";
+import { User } from "../mongo/userSchema";
 import { retrieveSocket } from "../socketLogic/socketArray";
 import { playerNum, updateGameResualts } from "../socketLogic/utils";
 import { IGameObject } from "../types/gameTypes";
 import { IJoinGameBody, ILogoutBody } from "../types/requestBodyTypes";
 import { IFunctionResponse } from "../types/routesTypes";
-import {
-  pushGameToArray,
-  retrieveGameObject,
-} from "../userManegement/gameHandeling";
+import { retrieveGameObject } from "../userManegement/gameHandeling";
+import createGame from "./utils/gameUtils/createGame";
 import joinGame from "./utils/gameUtils/joinGame";
 import logOutOfGame from "./utils/gameUtils/logoutOfGame";
 import parseGameObject from "./utils/gameUtils/parseGameObject";
+const ObjectId = mongoose.Types.ObjectId;
 const router = express();
 
 router.get("/token", authenticateToken, (req, res) => {
@@ -20,13 +21,57 @@ router.get("/token", authenticateToken, (req, res) => {
   res.json({ gameToken });
 });
 
-router.post("/join", authenticateToken, (req, res) => {
+router.post("/create", authenticateToken, async (req, res) => {
+  const body = req.body;
+  const userId = res.locals.user._id;
+  if (typeof body.timer !== "number") {
+    return res.status(403).send("you must provide a timer");
+  }
+  const userInfo = await User.findOne({ _id: new ObjectId(userId) });
+  if (!userInfo) {
+    const newGameObjectRes = await createGame(
+      userId,
+      res.locals.user.userName,
+      "cool",
+      body.timer
+    );
+    return res.status(newGameObjectRes.status).send(newGameObjectRes.message);
+  }
+  const newGameObjectRes = await createGame(
+    userId,
+    userInfo.userName,
+    userInfo.styleCustomization.logo,
+    body.timer
+  );
+  if (newGameObjectRes.status === 200) {
+    return res.send(
+      JSON.stringify(
+        parseGameObject(JSON.parse(newGameObjectRes.message) as IGameObject)
+      )
+    );
+  }
+  return res.status(newGameObjectRes.status).send(newGameObjectRes.message);
+});
+
+router.post("/join", authenticateToken, async (req, res) => {
   const body: IJoinGameBody = req.body;
   if (typeof body.gameToken !== "string" || typeof body.userId !== "string")
     return res.status(403).send("bad request body");
   const userId = res.locals.user._id;
   const userName = res.locals.user.userName;
-  const joinedGameResponse = joinGame(body.gameToken, userId, userName);
+  const userCustomization = await User.findOne(
+    { _id: new ObjectId(userId) },
+    { "styleCustomization.logo": 1 }
+  );
+  const userLogo = userCustomization
+    ? userCustomization.styleCustomization.logo
+    : null;
+  const joinedGameResponse = joinGame(
+    body.gameToken,
+    userId,
+    userName,
+    userLogo
+  );
   if (joinedGameResponse.status === 200) {
     return res.send(
       JSON.stringify(

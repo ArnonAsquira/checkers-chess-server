@@ -1,10 +1,21 @@
 import Timer from "../gameLogic/timer/timer";
 
 interface IGameObject {
-  playerOne: { id: string; userName: string; timer: Timer } | null;
-  playerTwo: { id: string; userName: string; timer: Timer } | null;
+  playerOne: {
+    id: string;
+    userName: string;
+    timer: Timer;
+    logo: string | null;
+  } | null;
+  playerTwo: {
+    id: string;
+    userName: string;
+    timer: Timer;
+    logo: string | null;
+  } | null;
   gameId: string;
   gameinfo: IGameInfo;
+  initialTimer: number;
 }
 
 interface IGameInfo {
@@ -17,8 +28,13 @@ interface IGameInfo {
 }
 
 interface IParsedGameObject {
-  playerOne: { userName: string; id?: string; time: number } | null;
-  playerTwo: { userName: string; time: number } | null;
+  playerOne: {
+    userName: string;
+    id?: string;
+    time: number;
+    logo: string | null;
+  } | null;
+  playerTwo: { userName: string; time: number; logo: string | null } | null;
   gameId: string;
   gameinfo: IGameInfo;
 }

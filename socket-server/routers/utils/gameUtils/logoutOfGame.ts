@@ -1,7 +1,7 @@
 import { IGameObject } from "../../../types/gameTypes";
 import { removeGame } from "../../../userManegement/gameHandeling";
 import makeFucntionResponse from "../generalUtils/functionResponse";
-import { retrieveSocket, socketArray } from "../../../socketLogic/socketArray";
+import { retrieveSocket } from "../../../socketLogic/socketArray";
 
 const logOutOfGame = (gameObj: IGameObject, userId: string, gameId: string) => {
   const userSocket = retrieveSocket(userId);

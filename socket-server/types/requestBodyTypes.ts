@@ -4,4 +4,8 @@ interface IJoinGameBody {
 }
 type ILogoutBody = IJoinGameBody;
 
+interface ICreateGame {
+  timer: number;
+}
+
 export type { IJoinGameBody, ILogoutBody };

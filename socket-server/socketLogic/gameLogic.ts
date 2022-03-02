@@ -78,7 +78,8 @@ const handleLogic = (
       .emit(
         outGoingSocketEvents.joinedGame,
         gameObj.playerTwo && gameObj.playerTwo.userName,
-        gameObj.playerTwo && gameObj.playerTwo.timer.time
+        gameObj.playerTwo && gameObj.playerTwo.timer.time,
+        gameObj.playerTwo && gameObj.playerTwo.logo
       );
     if (gameObj.playerOne && gameObj.playerTwo) {
       const playerOneSocket = retrieveSocket(gameObj.playerOne.id);
