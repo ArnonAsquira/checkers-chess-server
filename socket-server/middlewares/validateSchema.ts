@@ -17,7 +17,7 @@ const authenticateTokenFunc = (token: string): IUserFromToken | false => {
     });
     return initialUser as IUserFromToken;
   } catch (err) {
-    console.log(err);
+    console.log("jwt error");
     return false;
   }
 };
@@ -26,11 +26,15 @@ export const authenticateToken: RequestHandler = (req, res, next) => {
   const accessToken =
     req.headers.authorization && req.headers.authorization.split(" ")[1];
   if (!accessToken) return res.status(401).send("Access Token Required");
-  jwt.verify(accessToken, secret, (err, user) => {
-    if (err) return res.status(403).send("Invalid Access Token");
-    res.locals.user = user;
-    next();
-  });
+  try {
+    jwt.verify(accessToken, secret, (err, user) => {
+      if (err) return res.status(403).send("Invalid Access Token");
+      res.locals.user = user;
+      next();
+    });
+  } catch (err) {
+    console.log("jwtError");
+  }
 };
 
 export { authenticateTokenFunc };
